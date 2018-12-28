@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:tns="http://ws.cloud.eledger.fit.com/ledger" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wssutil="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" name="CloudService" targetNamespace="http://ws.cloud.eledger.fit.com/ledger" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsp:UsingPolicy wssutil:Required="true" />
+  <ns0:Policy xmlns:ns0="http://schemas.xmlsoap.org/ws/2004/09/policy" wssutil:Id="Mtom.xml">
+    <ns1:OptimizedMimeSerialization xmlns:ns1="http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization" />
+  </ns0:Policy>
+  <wsdl:types>
+    <xs:schema targetNamespace="http://ws.cloud.eledger.fit.com/ledger">
+      <xs:element name="ServiceFault" type="tns:FaultMessage" />
+      <xs:complexType name="FaultMessage">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="code" type="xs:int" />
+          <xs:element minOccurs="1" maxOccurs="unbounded" name="messages" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="LedgerStream">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="fileName" type="xs:string" />
+          <xs:element xmime:expectedContentTypes="application/octet-stream" minOccurs="1" maxOccurs="1" name="binaryData" type="xs:base64Binary" />
+          <xs:element minOccurs="1" maxOccurs="1" name="hash" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="Company">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="identifier" type="xs:string" />
+          <xs:element minOccurs="1" maxOccurs="1" name="branchId" type="xs:int" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="SaveRequest" type="tns:SaveRequest" />
+      <xs:complexType name="SaveRequest">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="company" type="tns:Company" />
+          <xs:element minOccurs="1" maxOccurs="1" name="source" type="tns:LedgerStream" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="StatusRequest" type="tns:StatusRequest" />
+      <xs:complexType name="StatusRequest">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="company" type="tns:Company" />
+          <xs:element minOccurs="1" maxOccurs="1" name="ledgerId" type="xs:long" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="SaveResponse" type="tns:SaveResponse" />
+      <xs:complexType name="SaveResponse">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="ledgerId" type="xs:long" />
+          <xs:element minOccurs="1" maxOccurs="1" name="message" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="StatusResponse" type="tns:StatusResponse" />
+      <xs:complexType name="StatusResponse">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="code" type="xs:int" />
+          <xs:element minOccurs="1" maxOccurs="1" name="message" type="xs:string" />
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="serviceFault">
+    <wsdl:part name="fault" element="tns:ServiceFault" />
+  </wsdl:message>
+  <wsdl:message name="saveRequest">
+    <wsdl:part name="request" element="tns:SaveRequest" />
+  </wsdl:message>
+  <wsdl:message name="saveResponse">
+    <wsdl:part name="response" element="tns:SaveResponse" />
+  </wsdl:message>
+  <wsdl:message name="statusRequest">
+    <wsdl:part name="request" element="tns:StatusRequest" />
+  </wsdl:message>
+  <wsdl:message name="statusResponse">
+    <wsdl:part name="response" element="tns:StatusResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ELedgerCloudService">
+    <wsdl:operation name="save">
+      <wsdl:input message="tns:saveRequest" />
+      <wsdl:output message="tns:saveResponse" />
+      <wsdl:fault name="fault" message="tns:serviceFault" />
+    </wsdl:operation>
+    <wsdl:operation name="status">
+      <wsdl:input message="tns:statusRequest" />
+      <wsdl:output message="tns:statusResponse" />
+      <wsdl:fault name="fault" message="tns:serviceFault" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CloudServiceBinding" type="tns:ELedgerCloudService">
+    <wsp:PolicyReference URI="#Mtom.xml" />
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="save">
+      <soap12:operation soapAction="" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap12:fault use="literal" name="fault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="status">
+      <soap12:operation soapAction="" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap12:fault use="literal" name="fault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ELedgerCloud">
+    <wsdl:port name="ELedgerCloudService" binding="tns:CloudServiceBinding">
+      <soap12:address location="https://edefterws.fitbulut.com:443/ELedgerCloudService/ELedgerCloud" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
